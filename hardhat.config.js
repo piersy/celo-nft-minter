@@ -26,8 +26,23 @@ module.exports = {
         path: "m/44'/52752'/0'/0",
       },
     },
+    alfajores_pf: {
+      url: "http://localhost:8500",
+      accounts: {
+        mnemonic: "test test test test test test test test test test test junk",
+        path: "m/44'/52752'/0'/0",
+      },
+    },
     local: {
       url: "http://localhost:8545",
+      accounts: [
+        "0x9c8370d0f52a6429b6ceb0a8f124d639ab3e9c8149dd329c698fb8f46e3ad012",
+        "0xa4f3f26e7f134976074a78ebe8498494d94dfb0c9225d1e146b6dbf072a62433",
+        "0xfd506df2eb8c0a2ac7d8fb9243e0e7ddc3f8b74398fc2ce97aea5b56bb1a7b9e",
+      ],
+    },
+    local_test: {
+      url: "http://127.0.0.1:8081",
       accounts: [
         "0x9c8370d0f52a6429b6ceb0a8f124d639ab3e9c8149dd329c698fb8f46e3ad012",
         "0xa4f3f26e7f134976074a78ebe8498494d94dfb0c9225d1e146b6dbf072a62433",
