@@ -76,7 +76,7 @@ describe("MyNFT", function () {
     console.log("gas est tokenURI_1", est);
     let res = await provider.send("debug_traceCall", [
       args,
-      "latest",
+      "pending",
       { timeout: "1000s" },
     ]);
     console.log("trace gas est tokenURI_1", res.gas);
@@ -92,7 +92,7 @@ describe("MyNFT", function () {
     console.log("gas est tokenURI_1", est);
     let other = await provider.send("debug_traceCall", [
       args,
-      "latest",
+      "pending",
       { timeout: "1000s" },
     ]);
     console.log("trace gas est tokenURI_1", other.gas);
