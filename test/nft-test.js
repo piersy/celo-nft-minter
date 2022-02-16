@@ -58,12 +58,16 @@ describe("MyNFT", function () {
       to: myNFT.address,
       data: data,
     };
-    // var provider = new ethers.providers.JsonRpcProvider(
-    //   "http://127.0.0.1:8500"
-    // );
+
+    // alfajores_pr provider
     var provider = new ethers.providers.JsonRpcProvider(
-      "http://127.0.0.1:8081"
+      "http://127.0.0.1:8500"
     );
+
+    // local_test provider
+    // var provider = new ethers.providers.JsonRpcProvider(
+    //   "http://127.0.0.1:8081"
+    // );
 
     console.timeEnd("setup");
     let est = await myNFT
@@ -78,24 +82,24 @@ describe("MyNFT", function () {
     console.log("trace gas est tokenURI_1", res.gas);
     fs.writeFile("trace1", JSON.stringify(res), (err) => {});
 
-    for (let i = 0; i < 10; i++) {
-      await new Promise((p) => {
-        setTimeout(p, 2000);
-      });
-      est = await myNFT
-        .connect(owner)
-        .estimateGas.safeMint(acc1.address, tokenURI_1);
-      console.log("gas est tokenURI_1", est);
-      let other = await provider.send("debug_traceCall", [
-        args,
-        "latest",
-        { timeout: "1000s" },
-      ]);
-      console.log("trace gas est tokenURI_1", other.gas);
-      if (other.gas != res.gas) {
-        fs.writeFile("trace2", JSON.stringify(other), (err) => {});
-      }
+    // for (let i = 0; i < 10; i++) {
+    await new Promise((p) => {
+      setTimeout(p, 2000);
+    });
+    est = await myNFT
+      .connect(owner)
+      .estimateGas.safeMint(acc1.address, tokenURI_1);
+    console.log("gas est tokenURI_1", est);
+    let other = await provider.send("debug_traceCall", [
+      args,
+      "latest",
+      { timeout: "1000s" },
+    ]);
+    console.log("trace gas est tokenURI_1", other.gas);
+    if (other.gas != res.gas) {
+      fs.writeFile("trace2", JSON.stringify(other), (err) => {});
     }
+    // }
 
     const tx1 = await myNFT.connect(owner).safeMint(acc1.address, tokenURI_1);
     console.log(tx1);
