@@ -13,6 +13,7 @@ describe("MyNFT", function () {
   let acc1;
   let acc2;
 
+  console.log("provider url", hre.network.config.url);
   var provider = new ethers.providers.JsonRpcProvider(hre.network.config.url);
 
   this.beforeEach(async function () {
@@ -61,7 +62,7 @@ describe("MyNFT", function () {
 
     let args = {
       from: owner.address,
-      to: owner.address,
+      to: myNFT.address,
       data: data,
     };
 
@@ -77,20 +78,31 @@ describe("MyNFT", function () {
     });
 
     for (let i = 0; i < 4; i++) {
-      let est = await myNFT
-        .connect(owner)
-        .estimateGas.safeMint(acc1.address, tokenURI_1);
-      console.log("gas est tokenURI_1", est);
-
-      // let bn = await provider.send("eth_blockNumber");
-      // console.log("bn", parseInt(bn.slice(2), 16));
-
       let res = await provider.send("debug_traceCall", [
         args,
         "pending",
         { timeout: "1000s" },
       ]);
-      console.log("trace gas est tokenURI_1", res.gas);
+      console.log("pending trace gas tokenURI_1", res.gas);
+      res = await provider.send("debug_traceCall", [
+        args,
+        "latest",
+        { timeout: "1000s" },
+      ]);
+      console.log("latest trace gas tokenURI_1", res.gas);
+      res = await provider.send("eth_estimateGas", [args, "pending"]);
+      console.log("pending gas est tokenURI_1", Number(res));
+      res = await provider.send("eth_estimateGas", [args, "latest"]);
+      console.log("latest gas est tokenURI_1", Number(res));
+
+      // let est = await myNFT
+      //   .connect(owner)
+      //   .estimateGas.safeMint(acc1.address, tokenURI_1);
+      // console.log("gas est tokenURI_1", est);
+
+      // let bn = await provider.send("eth_blockNumber");
+      // console.log("bn", parseInt(bn.slice(2), 16));
+
       // fs.writeFile("trace" + i, JSON.stringify(res), (err) => {});
     }
 
