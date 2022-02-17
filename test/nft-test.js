@@ -1,6 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const fs = require("fs");
+const hre = require("hardhat");
 
 let MyNFT;
 
@@ -12,14 +13,19 @@ describe("MyNFT", function () {
   let acc1;
   let acc2;
 
+  var provider = new ethers.providers.JsonRpcProvider(hre.network.config.url);
+
   this.beforeEach(async function () {
+    // alfajores_pr provider
     // This is executed before each test
     // Deploying the smart contract
     [owner, acc1, acc2] = await ethers.getSigners();
 
+    let dd = await ethers.getSigner(acc1.address);
     MyNFT = await ethers.getContractFactory("MyNFT");
     myNFT = await MyNFT.deploy();
-    await myNFT.deployTransaction.wait();
+    let dtx = await myNFT.deployTransaction.wait();
+    console.log("deployed in", dtx.blockNumber);
   });
 
   // it("Should set the right owner", async function () {
@@ -55,51 +61,38 @@ describe("MyNFT", function () {
 
     let args = {
       from: owner.address,
-      to: myNFT.address,
+      to: owner.address,
       data: data,
     };
 
-    // alfajores_pr provider
-    var provider = new ethers.providers.JsonRpcProvider(
-      "http://127.0.0.1:8500"
-    );
-
-    // local_test provider
-    // var provider = new ethers.providers.JsonRpcProvider(
-    //   "http://127.0.0.1:8081"
-    // );
-
     console.timeEnd("setup");
-    let est = await myNFT
-      .connect(owner)
-      .estimateGas.safeMint(acc1.address, tokenURI_1);
-    console.log("gas est tokenURI_1", est);
-    let res = await provider.send("debug_traceCall", [
-      args,
-      "pending",
-      { timeout: "1000s" },
-    ]);
-    console.log("trace gas est tokenURI_1", res.gas);
-    fs.writeFile("trace1", JSON.stringify(res), (err) => {});
 
-    // for (let i = 0; i < 10; i++) {
+    // console.time("get block number");
+    // let bn = await provider.send("eth_blockNumber");
+    // console.timeEnd("get block number");
+    // console.log("bn", parseInt(bn.slice(2), 16));
+
     await new Promise((p) => {
-      setTimeout(p, 2000);
+      setTimeout(p, 1000);
     });
-    est = await myNFT
-      .connect(owner)
-      .estimateGas.safeMint(acc1.address, tokenURI_1);
-    console.log("gas est tokenURI_1", est);
-    let other = await provider.send("debug_traceCall", [
-      args,
-      "pending",
-      { timeout: "1000s" },
-    ]);
-    console.log("trace gas est tokenURI_1", other.gas);
-    if (other.gas != res.gas) {
-      fs.writeFile("trace2", JSON.stringify(other), (err) => {});
+
+    for (let i = 0; i < 4; i++) {
+      let est = await myNFT
+        .connect(owner)
+        .estimateGas.safeMint(acc1.address, tokenURI_1);
+      console.log("gas est tokenURI_1", est);
+
+      // let bn = await provider.send("eth_blockNumber");
+      // console.log("bn", parseInt(bn.slice(2), 16));
+
+      let res = await provider.send("debug_traceCall", [
+        args,
+        "pending",
+        { timeout: "1000s" },
+      ]);
+      console.log("trace gas est tokenURI_1", res.gas);
+      // fs.writeFile("trace" + i, JSON.stringify(res), (err) => {});
     }
-    // }
 
     const tx1 = await myNFT.connect(owner).safeMint(acc1.address, tokenURI_1);
     console.log(tx1);
