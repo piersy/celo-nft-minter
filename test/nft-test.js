@@ -9,12 +9,15 @@ describe("MyNFT", function () {
   this.timeout(50000);
 
   let myNFT;
-  let owner;
-  let acc1;
-  let acc2;
+  let owner /*@type Signer*/;
+  let acc1 /*@type Signer*/;
+  let acc2 /*@type Signer*/;
 
   console.log("provider url", hre.network.config.url);
   var provider = new ethers.providers.JsonRpcProvider(hre.network.config.url);
+  // var provider /*@type JsonRpcProvider*/ = ethers.getDefaultProvider();
+
+  console.log("provider type", provider.constructor);
 
   this.beforeEach(async function () {
     // alfajores_pr provider
@@ -22,7 +25,7 @@ describe("MyNFT", function () {
     // Deploying the smart contract
     [owner, acc1, acc2] = await ethers.getSigners();
 
-    let dd = await ethers.getSigner(acc1.address);
+    // let dd = await ethers.getSigner(acc1.address);
     MyNFT = await ethers.getContractFactory("MyNFT");
     myNFT = await MyNFT.deploy();
     let dtx = await myNFT.deployTransaction.wait();
@@ -73,27 +76,36 @@ describe("MyNFT", function () {
     // console.timeEnd("get block number");
     // console.log("bn", parseInt(bn.slice(2), 16));
 
-    await new Promise((p) => {
-      setTimeout(p, 1000);
-    });
+    let bn;
 
-    for (let i = 0; i < 4; i++) {
-      let res = await provider.send("debug_traceCall", [
-        args,
-        "pending",
-        { timeout: "1000s" },
-      ]);
-      console.log("pending trace gas tokenURI_1", res.gas);
-      res = await provider.send("debug_traceCall", [
-        args,
-        "latest",
-        { timeout: "1000s" },
-      ]);
-      console.log("latest trace gas tokenURI_1", res.gas);
+    let res;
+    for (let i = 0; i < 10; i++) {
+      // bn = await provider.send("eth_blockNumber");
+      // console.log("bn", parseInt(bn.slice(2), 16));
+      // res = await provider.send("eth_estimateGas", [args, "pending"]);
+      // console.log("pending gas est tokenURI_1", Number(res));
+      // res = await provider.send("debug_traceCall", [
+      //   args,
+      //   "pending",
+      //   // { timeout: "1000s", tracer: simpleTracer },
+      //   { timeout: "1000s" },
+      // ]);
+      // console.log("pending trace gas tokenURI_1", res.gas);
+      // bn = await provider.send("eth_blockNumber");
+      // console.log("bn", parseInt(bn.slice(2), 16));
+      // res = await provider.send("debug_traceCall", [
+      //   args,
+      //   "latest",
+      //   { timeout: "1000s" },
+      // ]);
+      // console.log("latest trace gas tokenURI_1", res.gas);
       res = await provider.send("eth_estimateGas", [args, "pending"]);
       console.log("pending gas est tokenURI_1", Number(res));
       res = await provider.send("eth_estimateGas", [args, "latest"]);
       console.log("latest gas est tokenURI_1", Number(res));
+      // await new Promise((p) => {
+      //   setTimeout(p, 1000);
+      // });
 
       // let est = await myNFT
       //   .connect(owner)
@@ -123,3 +135,20 @@ describe("MyNFT", function () {
     expect(await myNFT.tokenURI(1)).to.equal(tokenURI_2);
   });
 });
+
+var simpleTracer = `{
+  // a simple tracer
+  data: [],
+  count: 0,
+  fault: function (log) {},
+  step: function (log) {
+    this.count++;
+    // if (this.count > 4376598 - 1000) {
+    //   str = log.getDepth() + " " + log.op.toString();
+    //   this.data.push(str);
+    // }
+  },
+  result: function () {
+    return this.count;
+  },
+}`;
